@@ -13,15 +13,13 @@ Since it relies on the name of HTML elements that might change in the future, we
 
 To install the required packages, execute:
 ```python
-python -m build
-pip install dist/netron_export_graph-*.whl
+pip install .
 ```
 
 Playwright may also need to install dependencies separately
 ```
 playwright install --with-deps chromium
 ```
-
 
 # Usage
 
