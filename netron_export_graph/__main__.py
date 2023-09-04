@@ -1,5 +1,5 @@
 import argparse
-from ._netron_export_graph import main
+from ._netron_export_graph import export_graph
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
@@ -16,4 +16,4 @@ if __name__ == "__main__":
                            help="Port that will be used to serve the Netron app")
     args = argparser.parse_args()
 
-    main(args.model_path, args.output, args.port, args.timeout)
+    export_graph(args.model_path, args.output, args.port, args.timeout)

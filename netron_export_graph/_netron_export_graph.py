@@ -1,4 +1,3 @@
-import argparse
 import asyncio
 import subprocess
 from typing import Optional
@@ -75,7 +74,7 @@ async def save_model_graphs(netron_url: str, out_path: Optional[str], timeout: i
         asyncio.get_event_loop().stop()
 
 
-def main(model_path: str, output: str, port: str, timeout: int):
+def export_graph(model_path: str, output: str, port: str, timeout: int):
     """
     Provides the main functionality of `netron_export_graph`
     """
