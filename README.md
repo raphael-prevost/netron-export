@@ -13,7 +13,8 @@ Since it relies on the name of HTML elements that might change in the future, we
 
 To install the required packages, execute:
 ```python
-pip install requirements.txt
+python -m build
+pip install dist/netron_export_graph-*.whl
 ```
 
 Playwright may also need to install dependencies separately
@@ -26,10 +27,10 @@ playwright install --with-deps chromium
 
 To execute the script, simply run
 ```
-python export_netron_graph.py ./my_model.onnx ./output.svg
+python -m netron_export_graph --output ./output.svg ./my_model.onnx
 ```
 More generally, you can run
 ```
-python export_netron_graph.py -h
+python -m netron_export_graph -h
 ```
 to see help on all available parameters.
