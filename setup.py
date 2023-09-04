@@ -31,7 +31,7 @@ setuptools.setup(
     url="https://github.com/imfusion/netron_export_graph",
     packages=setuptools.find_packages(),
     install_requires=[
-        'netron>=7.1.6',
+        'netron==7.1.6',
         'playwright'
     ],
     classifiers=[
