@@ -8,13 +8,14 @@ import playwright
 from playwright.async_api import async_playwright
 
 
-async def save_model_graphs(netron_url: str, out_path: Optional[str], timeout: int):
+async def save_model_graphs(netron_url: str, out_path: Optional[str], horizontal_mode: bool, timeout: int):
     """
     Opens the netron app in a fake browser and executes the export to png or svg.
 
     Args:
         netron_url (str): URL of the Netron server.
         out_path (str): Path of the output file (either *.png or *.svg).
+        horizontal_mode (bool): Show the graph horizontally rather than vertically.
         timeout (int): Timeout of requests in ms.
     """
 
@@ -47,6 +48,12 @@ async def save_model_graphs(netron_url: str, out_path: Optional[str], timeout: i
                 # Click on the hamburger button to show the menu
                 await page.click("#menu-button", timeout=timeout)
 
+                # Click on the Horizontal mode button if requested
+                if horizontal_mode:
+                    await page.click("#menu-item-2-3", timeout=timeout)
+                    # Re-open the menu
+                    await page.click("#menu-button", timeout=timeout)
+
                 # Start waiting for the download (triggered by netron when we click on the "Export to SVG" button)
                 async with page.expect_download() as download_info:
                     # Perform the action that initiates download, in this case click on the aforementioned button
@@ -75,7 +82,7 @@ async def save_model_graphs(netron_url: str, out_path: Optional[str], timeout: i
         asyncio.get_event_loop().stop()
 
 
-def export_graph(model_path: str, output: str, port: str, timeout: int):
+def export_graph(model_path: str, output: str, horizontal_mode: bool, port: str, timeout: int):
     """
     Provides the main functionality of `netron_export`
     """
@@ -84,7 +91,11 @@ def export_graph(model_path: str, output: str, port: str, timeout: int):
         # Starts the netron server locally
         netron.start(file=model_path, address=(HOST, port), browse=False)
         # Run the main function
-        asyncio.run(save_model_graphs(netron_url=f"http://{HOST}:{port}", out_path=output, timeout=timeout))
+        asyncio.run(
+            save_model_graphs(netron_url=f"http://{HOST}:{port}",
+                              out_path=output,
+                              horizontal_mode=horizontal_mode,
+                              timeout=timeout))
     finally:
         # Stops the netron server
         netron.stop()
@@ -100,6 +111,10 @@ def main():
                            "-o",
                            default="./network.png",
                            help="Output file to be written (either svg or png)")
+    argparser.add_argument("--horizontal",
+                           "-ho",
+                           action="store_true",
+                           help="Display the graph horizontally (rather than vertically by default)")
     argparser.add_argument("--timeout", "-t", default=5000, type=int, help="Timeout for requests in ms")
     argparser.add_argument("--port",
                            "-p",
@@ -108,4 +123,4 @@ def main():
                            help="Port that will be used to serve the Netron app")
     args = argparser.parse_args()
 
-    export_graph(args.model_path, args.output, args.port, args.timeout)
+    export_graph(args.model_path, args.output, args.horizontal, args.port, args.timeout)
