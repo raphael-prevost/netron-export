@@ -1,7 +1,9 @@
 import argparse
+
 from ._netron_export_graph import export_graph
 
-if __name__ == "__main__":
+
+def netron_export_main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("model_path", help="Path to model file (onnx, pt, etc.)")
     argparser.add_argument("--output",
@@ -17,3 +19,6 @@ if __name__ == "__main__":
     args = argparser.parse_args()
 
     export_graph(args.model_path, args.output, args.port, args.timeout)
+
+
+netron_export_main()

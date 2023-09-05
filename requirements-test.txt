@@ -1,3 +1,5 @@
 netron==7.1.5
+onnx
 playwright
+pytest
 torch

@@ -83,8 +83,7 @@ def export_graph(model_path: str, output: str, port: str, timeout: int):
         # Starts the netron server locally
         netron.start(file=model_path, address=(HOST, port), browse=False)
         # Run the main function
-        asyncio.run(
-            save_model_graphs(netron_url=f"http://{HOST}:{port}", out_path=output, timeout=timeout))
+        asyncio.run(save_model_graphs(netron_url=f"http://{HOST}:{port}", out_path=output, timeout=timeout))
     finally:
         # Stops the netron server
         netron.stop()

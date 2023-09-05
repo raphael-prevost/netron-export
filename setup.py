@@ -1,4 +1,5 @@
 import os.path
+
 import setuptools
 
 
@@ -21,23 +22,25 @@ with open("README.md", "r", encoding="utf8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="netron-export-graph",
-    version=get_version("netron_export_graph/__init__.py"),
+    name="netron-export",
+    version=get_version("netron_export/__init__.py"),
     author="ImFusion GmbH, Munich",
     author_email="info@imfusion.com",
     description="A helper package for plotting and exporting netron graph figures as PNG or SVG file.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/imfusion/netron_export_graph",
+    url="https://github.com/imfusion/netron-export",
     packages=setuptools.find_packages(),
-    install_requires=[
-        'netron==7.1.6',
-        'playwright'
-    ],
+    install_requires=["netron==7.1.6", "playwright"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.8',
+    python_requires=">=3.8",
+    entry_points={
+        "console_scripts": [
+            "netron_export = netron_export:netron_export_main",
+        ],
+    },
 )

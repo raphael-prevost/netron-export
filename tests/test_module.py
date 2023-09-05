@@ -1,10 +1,11 @@
 import os
-import sys
 import runpy
+import sys
 import tempfile
-import pytest
 
+import pytest
 import torch
+
 
 @pytest.mark.parametrize("ext", ["svg", "png"])
 def test_main(ext):
@@ -19,11 +20,11 @@ def test_main(ext):
         output_path = os.path.join(temp_dir, f"model.{ext}")
         torch.onnx.export(model, torch.rand(1, 10), model_path)
 
-        sys.argv = ['', "--output", output_path, model_path]
-        runpy.run_module("netron_export_graph", run_name="__main__")
+        sys.argv = ["", "--output", output_path, model_path]
+        runpy.run_module("netron_export", run_name="__main__")
 
         assert os.path.isfile(output_path), f"{output_path} not created"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()
