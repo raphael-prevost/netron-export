@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import subprocess
 from typing import Optional
@@ -76,7 +77,7 @@ async def save_model_graphs(netron_url: str, out_path: Optional[str], timeout: i
 
 def export_graph(model_path: str, output: str, port: str, timeout: int):
     """
-    Provides the main functionality of `netron_export_graph`
+    Provides the main functionality of `netron_export`
     """
     try:
         HOST = "127.0.0.1"
@@ -87,3 +88,24 @@ def export_graph(model_path: str, output: str, port: str, timeout: int):
     finally:
         # Stops the netron server
         netron.stop()
+
+
+def main():
+    """
+    Calls the main function of the package after parsing the arguments
+    """
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("model_path", help="Path to model file (onnx, pt, etc.)")
+    argparser.add_argument("--output",
+                           "-o",
+                           default="./network.png",
+                           help="Output file to be written (either svg or png)")
+    argparser.add_argument("--timeout", "-t", default=5000, type=int, help="Timeout for requests in ms")
+    argparser.add_argument("--port",
+                           "-p",
+                           default=8487,
+                           type=int,
+                           help="Port that will be used to serve the Netron app")
+    args = argparser.parse_args()
+
+    export_graph(args.model_path, args.output, args.port, args.timeout)

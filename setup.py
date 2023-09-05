@@ -40,7 +40,7 @@ setuptools.setup(
     python_requires=">=3.8",
     entry_points={
         "console_scripts": [
-            "netron_export = netron_export:netron_export_main",
+            "netron_export = netron_export:main",
         ],
     },
 )
