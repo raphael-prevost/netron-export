@@ -1,2 +1,0 @@
-netron==7.1.5
-playwright

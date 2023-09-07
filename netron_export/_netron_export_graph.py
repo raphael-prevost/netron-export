@@ -8,26 +8,27 @@ import playwright
 from playwright.async_api import async_playwright
 
 
-async def save_model_graphs(netron_url: str, out_path: Optional[str], timeout: int):
+async def save_model_graphs(netron_url: str, out_path: Optional[str], horizontal_mode: bool, timeout: int):
     """
     Opens the netron app in a fake browser and executes the export to png or svg.
-    
+
     Args:
         netron_url (str): URL of the Netron server.
         out_path (str): Path of the output file (either *.png or *.svg).
+        horizontal_mode (bool): Show the graph horizontally rather than vertically.
         timeout (int): Timeout of requests in ms.
     """
 
     try:  # Big try/catch block so that we can properly terminate the function (otherwise the script never finishes)
-        async with async_playwright() as p:
+        async with async_playwright() as pw:
             try:
-                browser = await p.chromium.launch()
+                browser = await pw.chromium.launch()
             except playwright._impl._api_types.Error as browser_error:
                 # This probably means that the browser extension has not been installed, so we try to run the command
                 print(str(browser_error))
                 print("Will install playwright-chromium and try again...")
-                subprocess.run(["playwright", "install", "chromium"])
-                browser = await p.chromium.launch()
+                subprocess.run(["playwright", "install", "--with-deps", "chromium"], check=True)
+                browser = await pw.chromium.launch()
 
             page = await browser.new_page()
             await page.goto(netron_url)
@@ -46,6 +47,12 @@ async def save_model_graphs(netron_url: str, out_path: Optional[str], timeout: i
 
                 # Click on the hamburger button to show the menu
                 await page.click("#menu-button", timeout=timeout)
+
+                # Click on the Horizontal mode button if requested
+                if horizontal_mode:
+                    await page.click("#menu-item-2-3", timeout=timeout)
+                    # Re-open the menu
+                    await page.click("#menu-button", timeout=timeout)
 
                 # Start waiting for the download (triggered by netron when we click on the "Export to SVG" button)
                 async with page.expect_download() as download_info:
@@ -75,14 +82,39 @@ async def save_model_graphs(netron_url: str, out_path: Optional[str], timeout: i
         asyncio.get_event_loop().stop()
 
 
-if __name__ == "__main__":
+def export_graph(model_path: str, output: str, horizontal_mode: bool, port: str, timeout: int):
+    """
+    Provides the main functionality of `netron_export`
+    """
+    try:
+        HOST = "127.0.0.1"
+        # Starts the netron server locally
+        netron.start(file=model_path, address=(HOST, port), browse=False)
+        # Run the main function
+        asyncio.run(
+            save_model_graphs(netron_url=f"http://{HOST}:{port}",
+                              out_path=output,
+                              horizontal_mode=horizontal_mode,
+                              timeout=timeout))
+    finally:
+        # Stops the netron server
+        netron.stop()
 
+
+def main():
+    """
+    Calls the main function of the package after parsing the arguments
+    """
     argparser = argparse.ArgumentParser()
     argparser.add_argument("model_path", help="Path to model file (onnx, pt, etc.)")
     argparser.add_argument("--output",
                            "-o",
                            default="./network.png",
                            help="Output file to be written (either svg or png)")
+    argparser.add_argument("--horizontal",
+                           "-ho",
+                           action="store_true",
+                           help="Display the graph horizontally (rather than vertically by default)")
     argparser.add_argument("--timeout", "-t", default=5000, type=int, help="Timeout for requests in ms")
     argparser.add_argument("--port",
                            "-p",
@@ -91,13 +123,4 @@ if __name__ == "__main__":
                            help="Port that will be used to serve the Netron app")
     args = argparser.parse_args()
 
-    try:
-        HOST = "127.0.0.1"
-        # Starts the netron server locally
-        netron.start(file=args.model_path, address=(HOST, args.port), browse=False)
-        # Run the main function
-        asyncio.run(
-            save_model_graphs(netron_url=f"http://{HOST}:{args.port}", out_path=args.output, timeout=args.timeout))
-    finally:
-        # Stops the netron server
-        netron.stop()
+    export_graph(args.model_path, args.output, args.horizontal, args.port, args.timeout)
