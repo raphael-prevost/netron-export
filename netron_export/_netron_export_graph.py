@@ -1,20 +1,20 @@
 import argparse
 import asyncio
 import subprocess
-from typing import Optional
+from typing import List, Optional
 
 import netron
 import playwright
 from playwright.async_api import async_playwright
 
 
-async def save_model_graphs(netron_url: str, out_path: Optional[str], horizontal_mode: bool, timeout: int):
+async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mode: bool, timeout: int):
     """
     Opens the netron app in a fake browser and executes the export to png or svg.
 
     Args:
         netron_url (str): URL of the Netron server.
-        out_path (str): Path of the output file (either *.png or *.svg).
+        out_paths (List[str]): Paths of the output files (either *.png or *.svg)
         horizontal_mode (bool): Show the graph horizontally rather than vertically.
         timeout (int): Timeout of requests in ms.
     """
@@ -67,13 +67,14 @@ async def save_model_graphs(netron_url: str, out_path: Optional[str], horizontal
                 print(f"Saved model architecture to {out_file}")
 
             # Actually perform the downloads
-            assert out_path
-            if out_path.endswith(".png"):
-                await click_and_download("#menu-item-0-1", out_path)  # save to PNG
-            elif out_path.endswith(".svg"):
-                await click_and_download("#menu-item-0-2", out_path)  # save to SVG
-            else:
-                raise ValueError("Output file must have .svg or .png extension")
+            for out_path in out_paths:
+                assert out_path
+                if out_path.endswith(".png"):
+                    await click_and_download("#menu-item-0-1", out_path)  # save to PNG
+                elif out_path.endswith(".svg"):
+                    await click_and_download("#menu-item-0-2", out_path)  # save to SVG
+                else:
+                    raise ValueError("Output file must have .svg or .png extension")
 
             await browser.close()
 
@@ -82,7 +83,7 @@ async def save_model_graphs(netron_url: str, out_path: Optional[str], horizontal
         asyncio.get_event_loop().stop()
 
 
-def export_graph(model_path: str, output: str, horizontal_mode: bool, port: str, timeout: int):
+def export_graph(model_path: str, output: List[str], horizontal_mode: bool, port: str, timeout: int):
     """
     Provides the main functionality of `netron_export`
     """
@@ -93,7 +94,7 @@ def export_graph(model_path: str, output: str, horizontal_mode: bool, port: str,
         # Run the main function
         asyncio.run(
             save_model_graphs(netron_url=f"http://{HOST}:{port}",
-                              out_path=output,
+                              out_paths=output,
                               horizontal_mode=horizontal_mode,
                               timeout=timeout))
     finally:
@@ -123,4 +124,4 @@ def main():
                            help="Port that will be used to serve the Netron app")
     args = argparser.parse_args()
 
-    export_graph(args.model_path, args.output, args.horizontal, args.port, args.timeout)
+    export_graph(args.model_path, [args.output], args.horizontal, args.port, args.timeout)
