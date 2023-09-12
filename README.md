@@ -15,10 +15,11 @@ Since it relies on the name of HTML elements that might change in the future, we
 
 To install the required packages, execute:
 ```python
-pip install .
+git clone https://github.com/raphael-prevost/netron-export.git
+pip install ./netron-export
 ```
 
-Playwright may also need to install dependencies separately
+Playwright might also need to install dependencies separately, you can do it via:
 ```
 playwright install --with-deps chromium
 ```
@@ -34,3 +35,11 @@ More generally, you can run
 netron_export -h
 ```
 to see help on all available parameters.
+
+## Contact
+
+This work was supported by ImFusion GmbH (Munich, Germany).
+
+[Website](https://www.imfusion.com/) |  [LinkedIn](https://www.linkedin.com/company/imfusion/) | [X (formerly Twitter)](https://twitter.com/ImFusionGmbH)
+
+

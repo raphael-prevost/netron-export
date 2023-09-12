@@ -24,12 +24,12 @@ with open("README.md", "r", encoding="utf8") as fh:
 setuptools.setup(
     name="netron-export",
     version=get_version("netron_export/__init__.py"),
-    author="ImFusion GmbH, Munich",
+    author="ImFusion GmbH",
     author_email="info@imfusion.com",
-    description="A helper package for plotting and exporting netron graph figures as PNG or SVG file.",
+    description="A helper package for plotting and exporting netron graph figures as a PNG or SVG file.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/imfusion/netron-export",
+    url="https://github.com/raphael-prevost/netron-export",
     packages=setuptools.find_packages(),
     install_requires=["netron==7.1.6", "playwright"],
     classifiers=[
