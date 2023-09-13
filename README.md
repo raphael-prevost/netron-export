@@ -19,6 +19,11 @@ git clone https://github.com/raphael-prevost/netron-export.git
 pip install ./netron-export
 ```
 
+Alternatively, you can directly install from GitHub with
+```bash
+pip install git+https://github.com/raphael-prevost/netron-export
+```
+
 Playwright might also need to install dependencies separately, you can do it via:
 ```
 playwright install --with-deps chromium
