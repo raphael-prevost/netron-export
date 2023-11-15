@@ -21,14 +21,22 @@ async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mo
 
     try:  # Big try/catch block so that we can properly terminate the function (otherwise the script never finishes)
         async with async_playwright() as pw:
+
             try:
                 browser = await pw.chromium.launch()
             except playwright._impl._api_types.Error as browser_error:
                 # This probably means that the browser extension has not been installed, so we try to run the command
                 print(str(browser_error))
                 print("Will install playwright-chromium and try again...")
-                subprocess.run(["playwright", "install", "--with-deps", "chromium"], check=True)
-                browser = await pw.chromium.launch()
+                try:
+                    subprocess.run(["playwright", "install", "--with-deps", "chromium"], check=True, timeout=60)
+                    browser = await pw.chromium.launch()
+                except subprocess.TimeoutExpired as err:
+                    print(
+                        "Could not install playwright dependencies (maybe it is asking for sudo privileges). Please install it manually with the command 'sudo playwright install --with-deps chromium'."
+                    )
+                    return
+                print("Installation of playwright dependencies finished")
 
             page = await browser.new_page()
             await page.goto(netron_url)
