@@ -1,7 +1,9 @@
 import argparse
 import asyncio
+import random
 import subprocess
-from typing import List, Optional
+import warnings
+from typing import List
 
 import netron
 import playwright
@@ -32,7 +34,7 @@ async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mo
                     subprocess.run(["playwright", "install", "--with-deps", "chromium"], check=True, timeout=60)
                     browser = await pw.chromium.launch()
                 except subprocess.TimeoutExpired as err:
-                    print(
+                    warnings.warn(
                         "Could not install playwright dependencies (maybe it is asking for sudo privileges). Please install it manually with the command 'sudo playwright install --with-deps chromium'."
                     )
                     return
@@ -91,10 +93,16 @@ async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mo
         asyncio.get_event_loop().stop()
 
 
-def export_graph(model_path: str, output: List[str], horizontal_mode: bool, port: str, timeout: int):
+def export_graph(model_path: str,
+                 output: List[str],
+                 horizontal_mode: bool,
+                 port: int,
+                 timeout: int,
+                 allowed_port_trials: int = 100):
     """
     Provides the main functionality of `netron_export`
     """
+
     try:
         HOST = "127.0.0.1"
         # Starts the netron server locally
@@ -105,6 +113,32 @@ def export_graph(model_path: str, output: List[str], horizontal_mode: bool, port
                               out_paths=output,
                               horizontal_mode=horizontal_mode,
                               timeout=timeout))
+
+    except (OSError, PermissionError) as err:
+        # Port is already in use or socket was not available (we do not rely on the error numbers because they are OS-dependent).
+        # The first condition occurs on Linux, the second one on Windows.
+        if "Address already in use" in str(
+                err) or "An attempt was made to access a socket in a way forbidden by its access permissions" in str(
+                    err):
+            print(f"Exception encountered: {err}")
+            if allowed_port_trials <= 1:
+                print("Could not find a port to open netron on")
+                return
+            new_port = random.randrange(10000, 65000)  # Try out another port randomly
+            print(f"Trying out with another port {new_port}")
+
+            # Not sure if this is needed but we make sure that the failing netron instance is closed
+            netron.stop()
+
+            # Call same function with a reduced allowed_port_trials
+            export_graph(model_path=model_path,
+                         output=output,
+                         horizontal_mode=horizontal_mode,
+                         port=new_port,
+                         timeout=timeout,
+                         allowed_port_trials=allowed_port_trials - 1)
+        else:
+            raise err
     finally:
         # Stops the netron server
         netron.stop()
