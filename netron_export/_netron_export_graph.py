@@ -41,6 +41,7 @@ async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mo
                 print("Installation of playwright dependencies finished")
 
             page = await browser.new_page()
+
             async def handle(route, request):
                 # Block url's other than netron_url
                 if not request.url.startswith(netron_url):
