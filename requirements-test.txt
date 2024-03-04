@@ -1,5 +1,4 @@
-netron==7.1.5
+# List of extra packages only required to run the tests
 onnx
-playwright
 pytest
 torch

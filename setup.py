@@ -31,7 +31,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/raphael-prevost/netron-export",
     packages=setuptools.find_packages(),
-    install_requires=["netron==7.1.6", "playwright"],
+    install_requires=["netron==7.5.2", "playwright==1.37.0"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
