@@ -41,6 +41,18 @@ netron_export -h
 ```
 to see help on all available parameters.
 
+## Running Tests
+
+The tests have a couple of extra requirements that need to be installed:
+```
+pip install -r requirements-test.txt
+```
+Then you can run
+```
+pytest tests
+```
+and make sure all tests pass.
+
 ## Contact
 
 This work was supported by ImFusion GmbH (Munich, Germany).
