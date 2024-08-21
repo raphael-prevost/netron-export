@@ -31,7 +31,10 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/raphael-prevost/netron-export",
     packages=setuptools.find_packages(),
-    install_requires=["netron==7.6.4", "playwright==1.37.0"],
+    install_requires=[
+        "netron @ git+https://github.com/raphael-prevost/netron.git@v7.6.4#subdirectory=dist/pypi",
+        "playwright==1.37.0"
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
