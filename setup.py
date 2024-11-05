@@ -32,7 +32,7 @@ setuptools.setup(
     url="https://github.com/raphael-prevost/netron-export",
     packages=setuptools.find_packages(),
     install_requires=[
-        "netron @ git+https://github.com/raphael-prevost/netron.git@v7.6.4#subdirectory=dist/pypi",
+        "netron @ git+https://github.com/raphael-prevost/netron.git@v7.6.5#subdirectory=dist/pypi",
         "playwright==1.37.0"
     ],
     classifiers=[
