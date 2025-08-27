@@ -10,7 +10,7 @@ import playwright
 from playwright.async_api import async_playwright
 
 
-async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mode: bool, timeout: int):
+async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mode: bool, attrs_mode: bool, timeout: int):
     """
     Opens the netron app in a fake browser and executes the export to png or svg.
 
@@ -73,6 +73,11 @@ async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mo
                     # Re-open the menu
                     await page.click("#menu-button", timeout=timeout)
 
+                if attrs_mode:
+                    await page.click("#menu-item-2-0", timeout=timeout)
+                    # Re-open the menu
+                    await page.click("#menu-button", timeout=timeout)
+
                 # Start waiting for the download (triggered by netron when we click on the "Export to SVG" button)
                 async with page.expect_download() as download_info:
                     # Perform the action that initiates download, in this case click on the aforementioned button
@@ -105,6 +110,7 @@ async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mo
 def export_graph(model_path: str,
                  output: List[str],
                  horizontal_mode: bool,
+                 attrs_mode: bool,
                  port: int,
                  timeout: int,
                  allowed_port_trials: int = 100):
@@ -120,7 +126,7 @@ def export_graph(model_path: str,
         asyncio.run(
             save_model_graphs(netron_url=f"http://{HOST}:{port}",
                               out_paths=output,
-                              horizontal_mode=horizontal_mode,
+                              horizontal_mode=horizontal_mode,attrs_mode=attrs_mode,
                               timeout=timeout))
 
     except (OSError, PermissionError) as err:
@@ -167,6 +173,10 @@ def main():
                            "-ho",
                            action="store_true",
                            help="Display the graph horizontally (rather than vertically by default)")
+    argparser.add_argument("--attrs",
+                           "-at",
+                           action="store_true",
+                           help="Display the graph with attributes")
     argparser.add_argument("--timeout", "-t", default=5000, type=int, help="Timeout for requests in ms")
     argparser.add_argument("--port",
                            "-p",
@@ -175,4 +185,4 @@ def main():
                            help="Port that will be used to serve the Netron app")
     args = argparser.parse_args()
 
-    export_graph(args.model_path, [args.output], args.horizontal, args.port, args.timeout)
+    export_graph(args.model_path, [args.output], args.horizontal, args.attrs, args.port, args.timeout)
