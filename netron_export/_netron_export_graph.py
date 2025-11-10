@@ -57,6 +57,11 @@ async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mo
             # Wait for the main page to load (= body class turns to 'default')
             await page.wait_for_selector("body.default", timeout=timeout)
 
+            # Enable horizontal mode if requested (before any downloads)
+            if horizontal_mode:
+                await page.click("#menu-button", timeout=timeout)
+                await page.click("#menu-item-2-3", timeout=timeout)
+
             async def click_and_download(button_id: str, out_file: str):
                 """
                 Helper function to simulate the click on a button and write the downloaded file to a target location.
@@ -66,12 +71,6 @@ async def save_model_graphs(netron_url: str, out_paths: List[str], horizontal_mo
 
                 # Click on the hamburger button to show the menu
                 await page.click("#menu-button", timeout=timeout)
-
-                # Click on the Horizontal mode button if requested
-                if horizontal_mode:
-                    await page.click("#menu-item-2-3", timeout=timeout)
-                    # Re-open the menu
-                    await page.click("#menu-button", timeout=timeout)
 
                 # Start waiting for the download (triggered by netron when we click on the "Export to SVG" button)
                 async with page.expect_download() as download_info:
