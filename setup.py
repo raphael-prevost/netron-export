@@ -1,5 +1,4 @@
 import os.path
-import sys
 
 import setuptools
 
@@ -34,8 +33,9 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "netron @ git+https://github.com/raphael-prevost/netron.git@v7.6.5#subdirectory=dist/pypi",
-        # for python 3.12, we need greenlet>=3.0, which comes first with playwright>=1.39
-        "playwright==1.37.0" if sys.version_info[1] < 12 else "playwright==1.54.0"
+        # Python 3.12+ requires greenlet>=3.0, which first ships with playwright>=1.39.
+        "playwright==1.37.0; python_version < '3.12'",
+        "playwright==1.54.0; python_version >= '3.12'",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
